@@ -42,7 +42,7 @@ namespace ExpenseFlow.Api.Domain
             _approvalSteps.Clear();
         }
     }
-
+    
     public enum ExpenseStatus
     {
         Draft,
