@@ -1,3 +1,4 @@
+using ExpenseFlow.Api.Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseFlow.Api.Controllers
@@ -21,13 +22,16 @@ namespace ExpenseFlow.Api.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+
+            //Expense expense = new Expense();
+            //expense.Status = ExpenseStatus.Rejected;
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
-            .ToArray();
+            .ToArray();            
         }
     }
 }
