@@ -81,7 +81,14 @@ Expense
 
 
 
-## Domain
+## Domain vs models
 
 “I modelled expenses as objects that enforce their own state transitions,
  so invalid actions are impossible from the API layer.”
+
+
+
+## 你可以用这个“铁律”判断是否正确（非常重要）
+
+> **`ApprovalSteps[CurrentStepIndex]`
+>  必须永远指向“当前 Pending 的那一步”。**
