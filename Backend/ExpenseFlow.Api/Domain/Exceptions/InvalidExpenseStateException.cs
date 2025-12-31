@@ -11,5 +11,4 @@
         public ExpenseStatus CurrentStatus { get; }
         public ExpenseStatus ExpectedStatus { get; }
     }
-
 }
