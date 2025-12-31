@@ -92,3 +92,15 @@ Expense
 
 > **`ApprovalSteps[CurrentStepIndex]`
 >  必须永远指向“当前 Pending 的那一步”。**
+
+
+
+
+
+
+
+注意 
+
+​    `internal class ApprovalStep`
+
+> “ApprovalStep is not an aggregate root, it can only be created by Expense.”

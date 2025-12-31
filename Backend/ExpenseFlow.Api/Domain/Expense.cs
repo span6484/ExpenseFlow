@@ -9,8 +9,11 @@ namespace ExpenseFlow.Api.Domain
         public ExpenseStatus Status { get; private set; }
         public int CurrentStepIndex { get; private set; }
         private readonly List<ApprovalStep> _approvalSteps = new();
-        private IReadOnlyList<ApprovalStep> ApprovalSteps => _approvalSteps.AsReadOnly();
         private ExpenseDetails _details;
+
+        // mock audit users
+        private Guid _departmentManagerId;
+        private Guid _financeManagerId;
 
         public Expense(Guid createdByUserId)
         {
@@ -25,14 +28,19 @@ namespace ExpenseFlow.Api.Domain
         /// </summary>
         /// <param name="steps"></param>
         /// <exception cref="InvalidExpenseStateException"></exception>
-        public void Submit(IEnumerable<ApprovalStep> steps)
+        public void Submit()
         {
             if (Status != ExpenseStatus.Draft && Status != ExpenseStatus.Rejected) 
                 throw new InvalidExpenseStateException(
                     currentStatus: Status,
-                    expectedStatus: ExpenseStatus.Draft);   
+                    expectedStatus: ExpenseStatus.Draft);
+
+            if (_departmentManagerId == Guid.Empty || _financeManagerId == Guid.Empty)
+                throw new InvalidProcessException("Approvers are not configured.");
             _approvalSteps.Clear();
-            _approvalSteps.AddRange(steps);
+
+            _approvalSteps.Add(new ApprovalStep(Id, _departmentManagerId));
+            _approvalSteps.Add(new ApprovalStep(Id, _financeManagerId));
             CurrentStepIndex = 0;
             Status = ExpenseStatus.Submitted;
         }
@@ -41,13 +49,16 @@ namespace ExpenseFlow.Api.Domain
         /// Approval is a step-level decision.The aggregate updates its overall status only when the final step is approved.
         /// </summary>
         /// <exception cref="InvalidExpenseStateException"></exception>
-        public void ApproveCurrentStep()
+        public void ApproveCurrentStep(Guid userId)
         {
             if (Status != ExpenseStatus.Submitted)
                 throw new InvalidExpenseStateException(
                     currentStatus: Status,
                     expectedStatus: ExpenseStatus.Submitted);
+
             var step = _approvalSteps[CurrentStepIndex];
+            if (step.OperateUserId != userId)
+                throw new InvalidProcessException("User is not allowed to approve this step.");
             step.Approve();
             if (CurrentStepIndex == _approvalSteps.Count - 1)
             {
@@ -73,7 +84,7 @@ namespace ExpenseFlow.Api.Domain
         /// existed when the expense submitted but haven't been processed 
         /// </summary>
         /// <exception cref="InvalidExpenseStateException"></exception>
-        public void Withdraw()
+        public void WithdrawToDraft()
         {
             if (Status != ExpenseStatus.Submitted)
                 throw new InvalidExpenseStateException(
@@ -96,6 +107,19 @@ namespace ExpenseFlow.Api.Domain
                     expectedStatus: ExpenseStatus.Draft);
             _details = update;
         }
+
+
+        /// <summary>
+        /// template set mock users id
+        /// </summary>
+        /// <param name="departmentManagerId"></param>
+        /// <param name="financeManagerId"></param>
+        public void SetApprovers(Guid departmentManagerId, Guid financeManagerId)
+        {
+            _departmentManagerId = departmentManagerId;
+            _financeManagerId = financeManagerId;
+        }
+
 
     }
 
