@@ -9,18 +9,19 @@ namespace ExpenseFlow.Api.Domain
         public ExpenseStatus Status { get; private set; }
         public int CurrentStepIndex { get; private set; }
         private readonly List<ApprovalStep> _approvalSteps = new();
-        private ExpenseDetails _details;
+        public ExpenseDetails Details { get; private set; }
 
         // mock audit users
         private Guid _departmentManagerId;
         private Guid _financeManagerId;
 
-        public Expense(Guid createdByUserId)
+        public Expense(Guid createdByUserId, ExpenseDetails details)
         {
             Id = Guid.NewGuid();
             CreatedByUserId = createdByUserId;
             Status = ExpenseStatus.Draft;
             CurrentStepIndex = 0;
+            Details = details ?? throw new ArgumentNullException(nameof(details));
         }
 
         /// <summary>
@@ -105,7 +106,7 @@ namespace ExpenseFlow.Api.Domain
                 throw new InvalidExpenseStateException(
                     currentStatus: Status,
                     expectedStatus: ExpenseStatus.Draft);
-            _details = update;
+            Details = update;
         }
 
 
@@ -116,6 +117,14 @@ namespace ExpenseFlow.Api.Domain
         /// <param name="financeManagerId"></param>
         public void SetApprovers(Guid departmentManagerId, Guid financeManagerId)
         {
+            if (departmentManagerId == Guid.Empty)
+                throw new ArgumentException("Department manager is required");
+
+            if (financeManagerId == Guid.Empty)
+                throw new ArgumentException("Finance manager is required");
+
+            if (Status != ExpenseStatus.Draft)
+                throw new InvalidExpenseStateException(Status, ExpenseStatus.Draft);
             _departmentManagerId = departmentManagerId;
             _financeManagerId = financeManagerId;
         }

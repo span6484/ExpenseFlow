@@ -1,6 +1,7 @@
-﻿using ExpenseFlow.Api.Domain.Exceptions;
+﻿using ExpenseFlow.Api.Application.Exceptions;
+using ExpenseFlow.Api.Domain.Exceptions;
 using System.Net;
-using ApplicationException = ExpenseFlow.Api.Domain.Exceptions.ApplicationException;
+using ApplicationException = ExpenseFlow.Api.Application.Exceptions.ApplicationException;
 
 public class GlobalExceptionMiddleware
 {
@@ -41,6 +42,17 @@ public class GlobalExceptionMiddleware
             {
                 error = "VALIDATION_ERROR",
                 field = ex.Field,
+                message = ex.Message
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                error = "NOT_FOUND",
+                resource = ex.ResourceName,
+                key = ex.Key,
                 message = ex.Message
             });
         }

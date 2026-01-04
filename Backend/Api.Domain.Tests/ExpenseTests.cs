@@ -18,8 +18,8 @@ namespace Api.Domain.Tests
             var creatorId = Guid.NewGuid();
             var departmentManagerId = Guid.NewGuid();
             var financeManagerId = Guid.NewGuid();
-
-            var expense = new Expense(creatorId);
+            var expenseDetail = new ExpenseDetails(60, "test2");
+            var expense = new Expense(creatorId, expenseDetail);
             expense.SetApprovers(departmentManagerId, financeManagerId);
 
             // Act
@@ -33,8 +33,10 @@ namespace Api.Domain.Tests
         [Fact]
         public void Approve_Should_Throw_When_Expense_Is_Not_Submitted()
         {
+            var expenseDetail = new ExpenseDetails(60, "test2");
+
             var creatorId = Guid.NewGuid();
-            var expense = new Expense(creatorId);
+            var expense = new Expense(creatorId, expenseDetail);
 
             // Act
             var act = () => expense.ApproveCurrentStep(Guid.NewGuid());
@@ -46,8 +48,10 @@ namespace Api.Domain.Tests
         [Fact]
         public void Approve_Should_Throw_When_Approver_Is_Creator()
         {
+            var expenseDetail = new ExpenseDetails(60, "test2");
+
             var creatorId = Guid.NewGuid();
-            var expense = new Expense(creatorId);
+            var expense = new Expense(creatorId, expenseDetail);
             var departmentManagerId = Guid.NewGuid();
             var financeManagerId = Guid.NewGuid();
             expense.SetApprovers(departmentManagerId, financeManagerId);
@@ -60,8 +64,10 @@ namespace Api.Domain.Tests
         [Fact]
         public void One_Approve_Status_Still_Submitted()
         {
+            var expenseDetail = new ExpenseDetails(60, "test2");
+
             var creatorId = Guid.NewGuid();
-            var expense = new Expense(creatorId);
+            var expense = new Expense(creatorId, expenseDetail);
             var departmentManagerId = Guid.NewGuid();
             var financeManagerId = Guid.NewGuid();
             expense.SetApprovers(departmentManagerId, financeManagerId);
@@ -74,8 +80,10 @@ namespace Api.Domain.Tests
         public void Submit_Should_Throw_When_No_Approver_Set()
         {
 
+
+            var expenseDetail = new ExpenseDetails(60, "test2");
             var creatorId = Guid.NewGuid();
-            var expense = new Expense(creatorId);
+            var expense = new Expense(creatorId, expenseDetail);
             var act = () => expense.Submit();
             act.Should().Throw<InvalidProcessException>();
         }
@@ -86,8 +94,9 @@ namespace Api.Domain.Tests
             var creatorId = Guid.NewGuid();
             var dept = Guid.NewGuid();
             var finance = Guid.NewGuid();
+            var expenseDetail = new ExpenseDetails(60, "test2");
 
-            var expense = new Expense(creatorId);
+            var expense = new Expense(creatorId, expenseDetail);
             expense.SetApprovers(dept, finance);
             expense.Submit();
 
@@ -105,8 +114,9 @@ namespace Api.Domain.Tests
             var creatorId = Guid.NewGuid();
             var dept = Guid.NewGuid();
             var finance = Guid.NewGuid();
+            var expenseDetail = new ExpenseDetails(60, "test2");
 
-            var expense = new Expense(creatorId);
+            var expense = new Expense(creatorId, expenseDetail);
             expense.SetApprovers(dept, finance);
             expense.Submit();
 

@@ -8,10 +8,10 @@ namespace ExpenseFlow.Api.Application.Interfaces
         /// <summary>
         /// Retrieves an expense aggregate by its identifier.
         /// </summary>
-        Expense Get(Guid uid);
+        Task<Expense> GetAsync(Guid uid);
         /// <summary>
         /// Persists the expense aggregate (insert or update as needed).
         /// </summary>
-        void Save(Expense expense);
+        Task SaveAsync(Expense expense);
     }
 }
